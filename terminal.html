@@ -26,8 +26,6 @@
         .btn { padding: 0.8rem 1.5rem; background: transparent; color: #38bdf8; border: 1px solid #38bdf8; font-weight: bold; cursor: pointer; border-radius: 4px; text-transform: uppercase; margin-top: 1rem; width: 100%; letter-spacing: 2px; transition: 0.3s; }
         .btn:hover { background: #38bdf8; color: #000; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
         .btn-locked { background: rgba(255,255,255,0.05); color: #71717a; border-color: transparent; cursor: not-allowed; }
-        
-        .dev-skip { background: #f43f5e; color: white; border: none; padding: 5px 10px; font-size: 0.7rem; border-radius: 3px; cursor: pointer; position: absolute; top: 10px; right: 10px; }
 
         .input-field { width: 100%; padding: 1rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(56, 189, 248, 0.3); color: white; margin-top: 1rem; font-family: 'Courier New', Courier, monospace; font-size: 1.2rem; text-align: center; letter-spacing: 2px; border-radius: 4px; }
         .input-field:focus { outline: none; border-color: #38bdf8; }
@@ -189,7 +187,6 @@
     <!-- MODALS -->
     <div class="modal" id="game2-modal">
         <div class="modal-inner">
-            <button class="dev-skip" onclick="winGame2()">DEV SKIP</button>
             <h3 style="color: #38bdf8; margin-bottom: 1rem; letter-spacing: 2px;">BRUTE FORCE PROTOCOL</h3>
             <p style="font-size: 0.9rem; margin-bottom: 1rem; color: #a1a1aa;">Guess the 3-digit PIN (100-999). Within 5 digits bypasses lock. 7 attempts.</p>
             <div class="log" id="hack-log"> > System initialized...<br></div>
@@ -201,7 +198,6 @@
 
     <div class="modal" id="game3-modal">
         <div class="modal-inner">
-            <button class="dev-skip" onclick="winGame3()">DEV SKIP</button>
             <h3 style="color: #38bdf8; margin-bottom: 1rem; letter-spacing: 2px;">SIGNAL ROUTING</h3>
             <p id="simon-status" style="font-size: 0.9rem; margin-bottom: 1.5rem; color: #a1a1aa;">Repeat sequence for 4 rounds.</p>
             <div class="simon-grid">
@@ -217,7 +213,6 @@
 
     <div class="modal" id="game5-modal">
         <div class="modal-inner">
-            <button class="dev-skip" onclick="winGame5()">DEV SKIP</button>
             <h3 style="color: #38bdf8; margin-bottom: 1rem; letter-spacing: 2px;">FIREWALL INTERCEPT</h3>
             <p id="slider-status" style="font-size: 0.9rem; margin-bottom: 1.5rem; color: #a1a1aa;">Hit [STOP] when block is in target zone. 3 hits needed.</p>
             <div style="font-size: 1.2rem; margin-bottom: 10px; color: #38bdf8;">HITS: <span id="slider-hits" style="color: #fff; font-weight: bold;">0</span> / 3</div>
