@@ -1,0 +1,39 @@
+:root {
+    --bg-main: #0a0a0a;
+    --bg-card: #171717;
+    --accent: #3b82f6; /* Cold Corporate Blue */
+    --accent-glow: rgba(59, 130, 246, 0.5);
+    --text-main: #e5e5e5;
+    --text-muted: #737373;
+    --error: #ef4444;
+    --success: #10b981;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+body { background-color: var(--bg-main); color: var(--text-main); line-height: 1.6; }
+
+header { background: #000; padding: 2rem; border-bottom: 1px solid var(--accent); text-align: center; box-shadow: 0 0 20px var(--accent-glow); }
+header h1 { letter-spacing: 4px; text-transform: uppercase; }
+
+.container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+
+/* Product Page Styles */
+.product-grid { display: grid; grid-template-columns: 1fr; gap: 3rem; margin-top: 2rem; }
+.product-card { background: var(--bg-card); border: 1px solid #262626; padding: 2rem; border-radius: 4px; position: relative; overflow: hidden; }
+.product-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent); }
+.product-card.discontinued::before { background: var(--error); }
+.product-title { font-size: 1.8rem; color: var(--accent); margin-bottom: 1rem; border-bottom: 1px solid #262626; padding-bottom: 0.5rem; }
+.sku { font-family: monospace; color: var(--text-muted); font-size: 1.1rem; margin-bottom: 1rem; }
+.sku span { color: var(--error); font-weight: bold; } /* For the hidden clue */
+
+/* Terminal Styles */
+.terminal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.node-card { background: #000; border: 1px solid #262626; padding: 1.5rem; text-align: center; border-radius: 4px; transition: 0.3s; }
+.node-card.locked { border-color: var(--error); color: var(--text-muted); }
+.node-card.unlocked { border-color: var(--success); box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+
+.btn { padding: 0.8rem 1.5rem; background: var(--accent); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 2px; text-transform: uppercase; margin-top: 1rem; width: 100%; }
+.btn:hover { background: #2563eb; box-shadow: 0 0 10px var(--accent-glow); }
+.btn-locked { background: #262626; color: #737373; cursor: not-allowed; }
+
+.input-field { width: 100%; padding: 1rem; background: #000; border: 1px solid var(--accent); color: white; margin-top: 1rem; font-family: monospace; font-size: 1.2rem; text-align: center; }

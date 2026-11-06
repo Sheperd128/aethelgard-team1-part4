@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aethelgard | Encrypted Cipher Vault</title>
+    <link rel="stylesheet" href="global.css">
+    <style>
+        body { background-color: #050505; color: #d4d4d8; font-family: 'Courier New', Courier, monospace; padding: 2rem; }
+        .vault-container { max-width: 800px; margin: 0 auto; background: rgba(20,20,20,0.9); border: 1px solid #38bdf8; padding: 2.5rem; border-radius: 8px; box-shadow: 0 0 30px rgba(56,189,248,0.2); }
+        h1 { color: #38bdf8; text-align: center; letter-spacing: 4px; margin-bottom: 2rem; font-weight: 300; }
+        .puzzle-box { background: #000; border: 1px solid #333; padding: 1.5rem; margin-bottom: 2rem; border-radius: 4px; }
+        .puzzle-title { color: #f43f5e; font-weight: bold; margin-bottom: 0.5rem; }
+        .cipher-text { font-size: 1.4rem; color: #eab308; letter-spacing: 3px; margin: 1rem 0; text-align: center; }
+        .hint { font-size: 0.85rem; color: #71717a; }
+        .btn-back { display: block; text-align: center; text-decoration: none; padding: 1rem; background: transparent; color: #38bdf8; border: 1px solid #38bdf8; font-family: 'Segoe UI', sans-serif; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; margin-top: 2rem; border-radius: 4px; }
+        .btn-back:hover { background: #38bdf8; color: #000; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
+    </style>
+</head>
+<body>
+
+    <div class="vault-container">
+        <h1>OFFSHORE CIPHER VAULT</h1>
+        <p style="text-align: center; color: #a1a1aa; margin-bottom: 2rem;">Encryption keys are scrambled here. Decrypt them to retrieve codes for terminal nodes 07, 08, and 09.</p>
+
+        <!-- Cipher for Node 7 (Backward Text) -->
+        <div class="puzzle-box">
+            <div class="puzzle-title">LOG 07: KITCHEN AUDIT ENCRYPTION</div>
+            <p>Intercepted a reversed transmission regarding the poison delivery:</p>
+            <div class="cipher-text">MOVENEW</div>
+            <p class="hint">Hint: Read backwards (reverse the spelling) to find the audit code for Node 07.</p>
+        </div>
+
+        <!-- Cipher for Node 8 (Caesar Shift - 5 steps forward) -->
+        <div class="puzzle-box">
+            <div class="puzzle-title">LOG 08: SECURITY BREACH ENCRYPTION</div>
+            <p>Security clearance shift-coded. Each letter has been moved 5 steps backward through the alphabet:</p>
+            <div class="cipher-text">MFZYS</div>
+            <p class="hint">Hint: Shift each letter 5 steps forward (A->F, B->G...) to reveal the Node 08 override code.</p>
+        </div>
+
+        <!-- Cipher for Node 9 (Scrambled Word) -->
+        <div class="puzzle-box">
+            <div class="puzzle-title">LOG 09: THE PUPPET ENCRYPTION</div>
+            <p>The final designation for the patsy has been scrambled across the network:</p>
+            <div class="cipher-text">TAGOEPACS</div>
+            <p class="hint">Hint: Unscramble the letters to find the target code for Node 09.</p>
+        </div>
+
+        <a href="terminal.html" class="btn-back">RETURN TO TERMINAL</a>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aethelgard | Node Terminal</title>
+    <link rel="stylesheet" href="global.css">
+    <style>
+        body { background-color: #050505; color: #d4d4d8; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        .terminal-header { text-align: center; margin-bottom: 3rem; margin-top: 2rem; }
+        .terminal-header h2 { color: #38bdf8; letter-spacing: 4px; font-weight: 300; text-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
+        
+        .terminal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; max-width: 1200px; margin: 0 auto; padding: 0 2rem; padding-bottom: 4rem; }
+        
+        .node-card { background: rgba(20, 20, 20, 0.8); border: 1px solid rgba(255, 255, 255, 0.05); padding: 1.5rem; text-align: center; border-radius: 8px; transition: 0.3s; position: relative; overflow: hidden; }
+        .node-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: #38bdf8; opacity: 0; transition: 0.3s; }
+        
+        .node-card.locked { border-color: rgba(244, 63, 94, 0.3); color: #71717a; }
+        .node-card.unlocked { border-color: rgba(16, 185, 129, 0.4); box-shadow: 0 0 20px rgba(16, 185, 129, 0.1); }
+        .node-card.unlocked::before { opacity: 1; background: #10b981; }
+
+        .node-content { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); text-align: left; font-size: 0.9rem; font-family: 'Courier New', Courier, monospace; }
+        .node-content.active { display: block; animation: fadeIn 0.5s; }
+        
+        .btn { padding: 0.8rem 1.5rem; background: transparent; color: #38bdf8; border: 1px solid #38bdf8; font-weight: bold; cursor: pointer; border-radius: 4px; text-transform: uppercase; margin-top: 1rem; width: 100%; letter-spacing: 2px; transition: 0.3s; }
+        .btn:hover { background: #38bdf8; color: #000; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
+        .btn-locked { background: rgba(255,255,255,0.05); color: #71717a; border-color: transparent; cursor: not-allowed; }
+        
+        .dev-skip { background: #f43f5e; color: white; border: none; padding: 5px 10px; font-size: 0.7rem; border-radius: 3px; cursor: pointer; position: absolute; top: 10px; right: 10px; }
+
+        .input-field { width: 100%; padding: 1rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(56, 189, 248, 0.3); color: white; margin-top: 1rem; font-family: 'Courier New', Courier, monospace; font-size: 1.2rem; text-align: center; letter-spacing: 2px; border-radius: 4px; }
+        .input-field:focus { outline: none; border-color: #38bdf8; }
+
+        /* Modal Styles */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,5,5,0.95); justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
+        .modal-inner { background: #0a0a0a; border: 1px solid #38bdf8; padding: 2.5rem; width: 90%; max-width: 500px; text-align: center; border-radius: 8px; position: relative; }
+        .log { background: #000; height: 120px; overflow-y: scroll; text-align: left; padding: 15px; font-family: monospace; color: #10b981; margin-bottom: 1.5rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; }
+        
+        /* Simon Says */
+        .simon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 300px; margin: 0 auto 1.5rem; }
+        .simon-btn { aspect-ratio: 1; border-radius: 8px; border: 2px solid transparent; cursor: pointer; transition: 0.2s; opacity: 0.5; }
+        .simon-btn:active { transform: scale(0.95); }
+        .simon-btn.active { opacity: 1; box-shadow: 0 0 20px currentColor; border-color: white; }
+        #s-green { background: #10b981; color: #10b981; }
+        #s-red { background: #f43f5e; color: #f43f5e; }
+        #s-yellow { background: #eab308; color: #eab308; }
+        #s-blue { background: #38bdf8; color: #38bdf8; }
+
+        /* Slider Game */
+        .slider-container { width: 100%; height: 40px; background: #171717; border: 1px solid #333; position: relative; margin: 2rem 0; border-radius: 4px; overflow: hidden; }
+        .target-zone { position: absolute; height: 100%; background: rgba(16, 185, 129, 0.3); border-left: 2px solid #10b981; border-right: 2px solid #10b981; }
+        .moving-block { position: absolute; height: 100%; width: 15px; background: #f43f5e; left: 0; box-shadow: 0 0 10px #f43f5e; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="terminal-header">
+        <h2>VAULT SECURITY TERMINAL</h2>
+        <p style="color: #a1a1aa; font-family: monospace;">10 Security Nodes Active. Decrypt sequentially.</p>
+    </div>
+
+    <div class="terminal-grid">
+        
+        <!-- NODE 1 -->
+        <div class="node-card" id="node-1">
+            <h3 style="color: #fff;">NODE 01: THE ARCHITECT</h3>
+            <input type="text" id="n1-input" class="input-field" placeholder="ENTER PROJECT KEYWORD" autocomplete="off">
+            <button class="btn" id="btn-1" onclick="unlockNode1()">DECRYPT</button>
+            <div class="node-content" id="n1-content">
+                <p style="color: #10b981;">[ DECRYPTION SUCCESSFUL ]</p>
+                <p style="margin-top: 10px;">Node 2 firewall online.</p>
+                <button class="btn" style="margin-top: 15px; font-size: 0.8rem;" onclick="enableNode(2)">ENABLE NODE 2 BYPASS</button>
+            </div>
+        </div>
+
+        <!-- NODE 2 -->
+        <div class="node-card locked" id="node-2">
+            <h3 style="color: #fff;">NODE 02: BRUTE FORCE</h3>
+            <p style="font-size: 0.8rem; margin-top: 10px; color: #71717a;">Requires Node 1 clearance.</p>
+            <button id="btn-2" class="btn btn-locked" onclick="openGame2()">LAUNCH HACK PROTOCOL</button>
+            <div class="node-content" id="n2-content">
+                <p style="color: #10b981;">[ FIREWALL BREACHED ]</p>
+                <p style="margin-top: 10px; color: #a1a1aa;">Protocol cleared. Enter 4-digit PIN in Node 3 to continue.</p>
+            </div>
+        </div>
+
+        <!-- NODE 3 -->
+        <div class="node-card locked" id="node-3">
+            <h3 style="color: #fff;">NODE 03: SIGNAL ROUTING</h3>
+            <input type="text" id="n3-input" class="input-field" placeholder="ENTER 4-DIGIT PIN" autocomplete="off" disabled>
+            <button id="btn-3" class="btn btn-locked" onclick="unlockNode3()">VERIFY PIN</button>
+            <div class="node-content" id="n3-content">
+                <p style="color: #10b981;">[ PIN ACCEPTED ]</p>
+                <p style="margin-top: 10px; color: #a1a1aa;">Signal relays out of sync. Synchronize relays below.</p>
+                <button class="btn" style="margin-top: 15px; font-size: 0.8rem;" onclick="openGame3()">SYNCHRONIZE RELAYS</button>
+            </div>
+        </div>
+
+        <!-- NODE 4 -->
+        <div class="node-card locked" id="node-4">
+            <h3 style="color: #fff;">NODE 04: LOGIC GATE</h3>
+            <p style="font-size: 0.85rem; margin-top: 10px; color: #a1a1aa;" id="n4-hint">Requires Node 3 synchronization.</p>
+            <input type="text" id="n4-input" class="input-field" placeholder="ENTER OVERRIDE KEY" autocomplete="off" style="display: none;">
+            <button id="btn-4" class="btn btn-locked" onclick="unlockNode4()">DECRYPT</button>
+            <div class="node-content" id="n4-content">
+                <p style="color: #10b981;">[ GATE OPENED ]</p>
+                <p style="margin-top: 10px; color: #a1a1aa;">Gate decrypted. Proceed to Node 5.</p>
+                <button class="btn" style="margin-top: 15px; font-size: 0.8rem;" onclick="enableNode(5)">PROCEED TO NODE 5</button>
+            </div>
+        </div>
+
+        <!-- NODE 5 -->
+        <div class="node-card locked" id="node-5">
+            <h3 style="color: #fff;">NODE 05: TIMING HACK</h3>
+            <p style="font-size: 0.8rem; margin-top: 10px; color: #71717a;">Requires Node 4 clearance.</p>
+            <button id="btn-5" class="btn btn-locked" onclick="openGame5()">INTERCEPT SIGNAL</button>
+            <div class="node-content" id="n5-content">
+                <p style="color: #10b981;">[ SIGNAL INTERCEPTED ]</p>
+                <p style="margin-top: 10px; color: #a1a1aa;">Intercept complete. Enter PIN in Node 6.</p>
+            </div>
+        </div>
+
+        <!-- NODE 6 -->
+        <div class="node-card locked" id="node-6">
+            <h3 style="color: #fff;">NODE 06: ENCRYPTED LORE</h3>
+            <input type="text" id="n6-input" class="input-field" placeholder="ENTER 4-DIGIT PIN" autocomplete="off" disabled>
+            <button id="btn-6" class="btn btn-locked" onclick="unlockNode6()">VERIFY PIN</button>
+            <div class="node-content" id="n6-content">
+                <p style="color: #10b981;">[ LORE UNLOCKED ]</p>
+                <p style="margin-top: 10px; color: #a1a1aa;">Final sectors unlocked. Check the Cipher Vault for access codes.</p>
+                <button class="btn" style="margin-top: 15px; font-size: 0.8rem; background: #10b981; color: #000;" onclick="enableNodes7_9()">INITIALIZE FINAL SECTORS</button>
+            </div>
+        </div>
+
+        <!-- NODE 7 -->
+        <div class="node-card locked" id="node-7">
+            <h3 style="color: #fff;">NODE 07: KITCHEN AUDIT</h3>
+            <p style="font-size: 0.8rem; margin-top: 10px; color: #71717a;">Requires Cipher Vault Code.</p>
+            <input type="text" id="n7-input" class="input-field" placeholder="ENTER AUDIT CODE" autocomplete="off" disabled>
+            <button class="btn btn-locked" id="btn-7" onclick="unlockGenericNode(7, 'VENOM')">VERIFY</button>
+            <div class="node-content" id="n7-content">
+                <p style="color: #10b981;">[ OVERRIDE ACCEPTED ]</p>
+                <p style="margin-top: 10px; color: #a1a1aa;">Bakugo and Sanji worked together. Marzipan masked the scent, the sommelier spiked the drink.</p>
+            </div>
+        </div>
+
+        <!-- NODE 8 -->
+        <div class="node-card locked" id="node-8">
+            <h3 style="color: #fff;">NODE 08: SECURITY BREACH</h3>
+            <p style="font-size: 0.8rem; margin-top: 10px; color: #71717a;">Requires Cipher Vault Code.</p>
+            <input type="text" id="n8-input" class="input-field" placeholder="ENTER BREACH CODE" autocomplete="off" disabled>
+            <button class="btn btn-locked" id="btn-8" onclick="unlockGenericNode(8, 'HAUNT')">VERIFY</button>
+            <div class="node-content" id="n8-content">
+                <p style="color: #10b981;">[ OVERRIDE ACCEPTED ]</p>
+                <p style="margin-top: 10px; color: #a1a1aa;">Levi ignored lockdown protocols intentionally, wiping body-cam footage to hide insubordination.</p>
+            </div>
+        </div>
+
+        <!-- NODE 9 -->
+        <div class="node-card locked" id="node-9">
+            <h3 style="color: #fff;">NODE 09: THE PUPPET</h3>
+            <p style="font-size: 0.8rem; margin-top: 10px; color: #71717a;">Requires Cipher Vault Code.</p>
+            <input type="text" id="n9-input" class="input-field" placeholder="ENTER TARGET CODE" autocomplete="off" disabled>
+            <button class="btn btn-locked" id="btn-9" onclick="unlockGenericNode(9, 'SCAPEGOAT')">VERIFY</button>
+            <div class="node-content" id="n9-content">
+                <p style="color: #10b981;">[ OVERRIDE ACCEPTED ]</p>
+                <p style="margin-top: 10px; color: #a1a1aa;">Naruto was manipulated, believing he was saving the foundation. He orchestrated the blackout.</p>
+            </div>
+        </div>
+
+        <!-- NODE 10 -->
+        <div class="node-card locked" id="node-10" style="grid-column: 1 / -1; max-width: 600px; margin: 0 auto; border-color: #38bdf8;">
+            <h3 style="color: #fff;">NODE 10: THE MASTERMIND</h3>
+            <p style="font-size: 0.9rem; margin-top: 10px; color: #38bdf8;">All fragments recovered. Who handed the puppet the strings?</p>
+            <input type="text" id="n10-input" class="input-field" placeholder="ENTER MASTERMIND NAME" autocomplete="off" disabled>
+            <button class="btn btn-locked" id="btn-10" onclick="unlockMastermind()">EXECUTE ARREST PROTOCOL</button>
+            <div class="node-content" id="n10-content" style="text-align: center;">
+                <h2 style="color: #10b981; font-size: 2rem; margin-bottom: 10px;">MYSTERY SOLVED</h2>
+                <p style="color: #fff; font-size: 1.1rem;">Sosuke Aizen manipulated the board to orchestrate the CEO's death without dirtying his own hands.</p>
+                <p style="color: #38bdf8; margin-top: 20px; font-weight: bold; font-size: 1.5rem;">CONGRATULATIONS, TEAM.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal" id="game2-modal">
+        <div class="modal-inner">
+            <button class="dev-skip" onclick="winGame2()">DEV SKIP</button>
+            <h3 style="color: #38bdf8; margin-bottom: 1rem; letter-spacing: 2px;">BRUTE FORCE PROTOCOL</h3>
+            <p style="font-size: 0.9rem; margin-bottom: 1rem; color: #a1a1aa;">Guess the 3-digit PIN (100-999). Within 5 digits bypasses lock. 7 attempts.</p>
+            <div class="log" id="hack-log"> > System initialized...<br></div>
+            <input type="number" id="hack-input" class="input-field" placeholder="000" max="999" min="100">
+            <button class="btn" onclick="submitHack()">TRANSMIT GUESS</button>
+            <button class="btn" style="border-color: #f43f5e; color: #f43f5e;" onclick="closeModal('game2-modal')">ABORT HACK</button>
+        </div>
+    </div>
+
+    <div class="modal" id="game3-modal">
+        <div class="modal-inner">
+            <button class="dev-skip" onclick="winGame3()">DEV SKIP</button>
+            <h3 style="color: #38bdf8; margin-bottom: 1rem; letter-spacing: 2px;">SIGNAL ROUTING</h3>
+            <p id="simon-status" style="font-size: 0.9rem; margin-bottom: 1.5rem; color: #a1a1aa;">Repeat sequence for 4 rounds.</p>
+            <div class="simon-grid">
+                <div class="simon-btn" id="s-green" onclick="handleSimon('s-green')"></div>
+                <div class="simon-btn" id="s-red" onclick="handleSimon('s-red')"></div>
+                <div class="simon-btn" id="s-yellow" onclick="handleSimon('s-yellow')"></div>
+                <div class="simon-btn" id="s-blue" onclick="handleSimon('s-blue')"></div>
+            </div>
+            <button class="btn" id="simon-start-btn" onclick="startSimon()">START SEQUENCE</button>
+            <button class="btn" style="border-color: #f43f5e; color: #f43f5e;" onclick="closeModal('game3-modal')">ABORT ROUTING</button>
+        </div>
+    </div>
+
+    <div class="modal" id="game5-modal">
+        <div class="modal-inner">
+            <button class="dev-skip" onclick="winGame5()">DEV SKIP</button>
+            <h3 style="color: #38bdf8; margin-bottom: 1rem; letter-spacing: 2px;">FIREWALL INTERCEPT</h3>
+            <p id="slider-status" style="font-size: 0.9rem; margin-bottom: 1.5rem; color: #a1a1aa;">Hit [STOP] when block is in target zone. 3 hits needed.</p>
+            <div style="font-size: 1.2rem; margin-bottom: 10px; color: #38bdf8;">HITS: <span id="slider-hits" style="color: #fff; font-weight: bold;">0</span> / 3</div>
+            <div class="slider-container" id="slider-box">
+                <div class="target-zone" id="target-zone" style="width: 60px; left: 150px;"></div>
+                <div class="moving-block" id="moving-block"></div>
+            </div>
+            <button class="btn" id="slider-action-btn" onclick="stopSlider()">STOP PACKET</button>
+            <button class="btn" style="border-color: #f43f5e; color: #f43f5e;" onclick="closeModal('game5-modal')">ABORT INTERCEPT</button>
+        </div>
+    </div>
+
+    <script>
+        function enableNode(nodeNum) {
+            const btn = document.getElementById(`btn-${nodeNum}`);
+            if(btn) btn.classList.remove('btn-locked');
+            document.getElementById(`node-${nodeNum}`).classList.remove('locked');
+            const input = document.getElementById(`n${nodeNum}-input`);
+            if(input) { input.disabled = false; input.style.display = 'block'; }
+        }
+
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function completeNode(nodeNum) {
+            document.getElementById(`n${nodeNum}-content`).classList.add('active');
+            document.getElementById(`node-${nodeNum}`).classList.add('unlocked');
+            const btn = document.getElementById(`btn-${nodeNum}`);
+            if(btn) btn.style.display = 'none';
+            const input = document.getElementById(`n${nodeNum}-input`);
+            if(input) input.style.display = 'none';
+        }
+
+        function winGame2() { closeModal('game2-modal'); completeNode(2); enableNode(3); }
+        function winGame3() { closeModal('game3-modal'); document.getElementById('n3-content').innerHTML = `<p style="color: #10b981;">[ RELAYS SYNCHRONIZED ]</p><p style="margin-top: 10px; color: #a1a1aa;">Logic gate powered. Answer riddle:<br><br><strong style="color: #fff;">What is the name of the notebook that kills whoever's name is written inside it?</strong></p>`; enableNode(4); }
+        function winGame5() { closeModal('game5-modal'); completeNode(5); enableNode(6); }
+
+        function unlockNode1() {
+            if(document.getElementById('n1-input').value.toUpperCase().trim() === "ILLUSION") { completeNode(1); } else alert("INCORRECT KEYWORD");
+        }
+
+        let targetPin = 0, attempts = 0;
+        function openGame2() {
+            if(document.getElementById('btn-2').classList.contains('btn-locked')) return;
+            document.getElementById('game2-modal').style.display = 'flex';
+            targetPin = Math.floor(Math.random() * 900) + 100;
+            attempts = 7;
+            document.getElementById('hack-log').innerHTML = `> Target Locked. ${attempts} attempts left.<br>`;
+        }
+        function submitHack() {
+            const guess = parseInt(document.getElementById('hack-input').value);
+            const log = document.getElementById('hack-log');
+            if(isNaN(guess) || guess < 100 || guess > 999) { log.innerHTML += `> <span style="color: #f43f5e;">ERROR: Invalid pin.</span><br>`; return; }
+            attempts--;
+            
+            if(Math.abs(guess - targetPin) <= 5) {
+                log.innerHTML += `> <span style="color: #10b981;">PROXIMITY ACCEPTED! FIREWALL BYPASSED.</span><br>`;
+                setTimeout(winGame2, 1500);
+            } else if (attempts === 0) {
+                log.innerHTML += `> <span style="color: #f43f5e;">FAILURE: REBOOTING...</span><br>`;
+                setTimeout(openGame2, 1500);
+            } else {
+                log.innerHTML += `> [${guess}] is <span style="color: #eab308;">${guess > targetPin ? "TOO HIGH" : "TOO LOW"}</span>. ${attempts} left.<br>`;
+            }
+            log.scrollTop = log.scrollHeight; document.getElementById('hack-input').value = '';
+        }
+
+        function unlockNode3() {
+            if(document.getElementById('n3-input').value.trim() === "5581") { completeNode(3); } else alert("INVALID PIN");
+        }
+
+        let simonSeq = [], playerSeq = [], simonLevel = 0, waitingForPlayer = false;
+        const colors = ['s-green', 's-red', 's-yellow', 's-blue'];
+        
+        function openGame3() {
+            document.getElementById('game3-modal').style.display = 'flex';
+            simonSeq = []; playerSeq = []; simonLevel = 0;
+            document.getElementById('simon-status').innerText = "Repeat sequence for 4 rounds.";
+            document.getElementById('simon-start-btn').style.display = 'block';
+        }
+        function startSimon() { document.getElementById('simon-start-btn').style.display = 'none'; nextSimonRound(); }
+        function nextSimonRound() {
+            playerSeq = []; simonLevel++;
+            document.getElementById('simon-status').innerText = `ROUND ${simonLevel} OF 4`;
+            simonSeq.push(colors[Math.floor(Math.random() * 4)]);
+            playSimonSequence();
+        }
+        function playSimonSequence() {
+            waitingForPlayer = false; let i = 0;
+            const interval = setInterval(() => {
+                const btn = document.getElementById(simonSeq[i]);
+                btn.classList.add('active'); setTimeout(() => btn.classList.remove('active'), 400); i++;
+                if(i >= simonSeq.length) { clearInterval(interval); waitingForPlayer = true; document.getElementById('simon-status').innerText = "YOUR TURN"; }
+            }, 800);
+        }
+        function handleSimon(colorId) {
+            if(!waitingForPlayer) return;
+            const btn = document.getElementById(colorId); btn.classList.add('active'); setTimeout(() => btn.classList.remove('active'), 200);
+            playerSeq.push(colorId); const currentIdx = playerSeq.length - 1;
+            
+            if(playerSeq[currentIdx] !== simonSeq[currentIdx]) {
+                document.getElementById('simon-status').innerHTML = "<span style='color: #f43f5e;'>FAILED. REBOOTING...</span>";
+                waitingForPlayer = false; setTimeout(openGame3, 2000); return;
+            }
+            if(playerSeq.length === simonSeq.length) {
+                waitingForPlayer = false;
+                if(simonLevel === 4) { document.getElementById('simon-status').innerHTML = "<span style='color: #10b981;'>COMPLETE</span>"; setTimeout(winGame3, 1500); } 
+                else { document.getElementById('simon-status').innerText = "ACCEPTED. NEXT..."; setTimeout(nextSimonRound, 1000); }
+            }
+        }
+
+        function unlockNode4() {
+            if(document.getElementById('n4-input').value.toUpperCase().replace(/\s/g, "") === "DEATHNOTE") { completeNode(4); } else alert("INVALID OVERRIDE KEY");
+        }
+
+        let sliderPos = 0, sliderDir = 1, sliderSpeed = 4, sliderHits = 0, sliderActive = false, animationFrame;
+        function openGame5() {
+            if(document.getElementById('btn-5').classList.contains('btn-locked')) return;
+            document.getElementById('game5-modal').style.display = 'flex';
+            sliderHits = 0; sliderSpeed = 4;
+            document.getElementById('slider-hits').innerText = sliderHits;
+            document.getElementById('slider-action-btn').innerText = "START";
+            document.getElementById('slider-status').innerText = "Hit [STOP] when block is in target zone.";
+            const tz = document.getElementById('target-zone');
+            tz.style.left = (Math.floor(Math.random() * 200) + 50) + "px"; tz.style.width = "70px"; 
+        }
+        function stopSlider() {
+            const btn = document.getElementById('slider-action-btn');
+            if(btn.innerText === "START" || btn.innerText === "NEXT LEVEL") { btn.innerText = "STOP PACKET"; sliderActive = true; moveSlider(); return; }
+            if(!sliderActive) return;
+            sliderActive = false; cancelAnimationFrame(animationFrame);
+            const block = document.getElementById('moving-block'), target = document.getElementById('target-zone');
+            const blockLeft = block.offsetLeft, blockRight = blockLeft + block.offsetWidth;
+            const targetLeft = target.offsetLeft, targetRight = targetLeft + target.offsetWidth;
+
+            if (blockRight > targetLeft && blockLeft < targetRight) {
+                sliderHits++; document.getElementById('slider-hits').innerText = sliderHits;
+                if (sliderHits === 3) { document.getElementById('slider-status').innerHTML = "<span style='color: #10b981;'>SUCCESS</span>"; setTimeout(winGame5, 1500); } 
+                else {
+                    document.getElementById('slider-status').innerHTML = "<span style='color: #eab308;'>HIT. SPEEDING UP.</span>";
+                    sliderSpeed += 2; btn.innerText = "NEXT LEVEL";
+                    target.style.width = Math.max(20, 70 - (sliderHits * 10)) + "px"; 
+                    target.style.left = (Math.floor(Math.random() * 200) + 50) + "px";
+                }
+            } else {
+                document.getElementById('slider-status').innerHTML = "<span style='color: #f43f5e;'>MISSED. RESET.</span>";
+                sliderHits = 0; sliderSpeed = 4; document.getElementById('slider-hits').innerText = sliderHits; btn.innerText = "START";
+                target.style.width = "70px"; target.style.left = (Math.floor(Math.random() * 200) + 50) + "px";
+            }
+        }
+        function moveSlider() {
+            if(!sliderActive) return;
+            const block = document.getElementById('moving-block'), containerWidth = document.getElementById('slider-box').offsetWidth;
+            sliderPos += sliderSpeed * sliderDir;
+            if(sliderPos <= 0) { sliderPos = 0; sliderDir = 1; }
+            if(sliderPos >= containerWidth - 15) { sliderPos = containerWidth - 15; sliderDir = -1; }
+            block.style.left = sliderPos + "px";
+            animationFrame = requestAnimationFrame(moveSlider);
+        }
+
+        function unlockNode6() {
+            if(document.getElementById('n6-input').value.trim() === "4920") { completeNode(6); } else alert("INVALID PIN");
+        }
+
+        function enableNodes7_9() {
+            enableNode(7); enableNode(8); enableNode(9); enableNode(10);
+            alert("FINAL SECTORS UNLOCKED. CHECK THE CIPHER VAULT FOR CODES.");
+        }
+
+        function unlockGenericNode(nodeNum, expectedCode) {
+            const input = document.getElementById(`n${nodeNum}-input`).value.toUpperCase().trim();
+            if(input === expectedCode) { completeNode(nodeNum); } else alert("INVALID CODE");
+        }
+
+        function unlockMastermind() {
+            const input = document.getElementById('n10-input').value.toUpperCase().trim();
+            if(input === "AIZEN" || input === "SOSUKE AIZEN") { completeNode(10); } else alert("INCORRECT.");
+        }
+    </script>
+</body>
+</html>

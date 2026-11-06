@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aethelgard R&D | Prototype Division</title>
+    <link rel="stylesheet" href="global.css">
+    <style>
+        :root {
+            --vault-bg: #050505;
+            --vault-card: rgba(20, 20, 20, 0.8);
+            --neon-blue: #38bdf8;
+            --neon-red: #f43f5e;
+            --glass-border: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            background-color: var(--vault-bg);
+            background-image: 
+                linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #d4d4d8;
+        }
+
+        header {
+            background: linear-gradient(180deg, rgba(10,10,10,1) 0%, rgba(5,5,5,0) 100%);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 3rem 2rem;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+            opacity: 0.5;
+        }
+
+        h1 {
+            color: #ffffff;
+            font-weight: 300;
+            letter-spacing: 8px;
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .product-card {
+            background: var(--vault-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 2.5rem;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-color: rgba(56, 189, 248, 0.2);
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 3px;
+            background: var(--neon-blue);
+            opacity: 0.7;
+        }
+
+        .product-card.discontinued::before {
+            background: var(--neon-red);
+            opacity: 0.5;
+        }
+
+        .product-title {
+            font-size: 1.4rem;
+            color: #ffffff;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .discontinued .product-title { color: #a1a1aa; }
+
+        .sku {
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--neon-blue);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .discontinued .sku { color: var(--neon-red); }
+
+        .dev-tag {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #a1a1aa;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .status-tag {
+            display: inline-block;
+            margin-top: 1.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .status-active { color: var(--neon-blue); }
+        .status-dead { color: var(--neon-red); }
+
+        .terminal-access {
+            background: rgba(10, 10, 10, 0.9);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 3rem;
+            margin-top: 4rem;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+        }
+
+        .input-field {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: #fff;
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.2rem;
+            letter-spacing: 4px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .input-field:focus { outline: none; border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(56, 189, 248, 0.2); }
+
+        .btn-connect {
+            background: transparent;
+            color: var(--neon-blue);
+            border: 1px solid var(--neon-blue);
+            padding: 1rem 3rem;
+            border-radius: 4px;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-left: 1rem;
+            text-transform: uppercase;
+        }
+
+        .btn-connect:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px rgba(56, 189, 248, 0.4); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>RESEARCH & DEVELOPMENT</h1>
+        <p style="color: #71717a; margin-top: 10px; font-family: 'Courier New', monospace; letter-spacing: 2px;">PROTOTYPE CATALOG // RESTRICTED ACCESS</p>
+        <div style="margin-top: 15px;">
+            <a href="puzzle-vault.html" style="color: rgba(56, 189, 248, 0.4); font-size: 0.85rem; text-decoration: none; font-family: 'Courier New', monospace; transition: 0.3s;" onmouseover="this.style.color='#38bdf8'" onmouseout="this.style.color='rgba(56, 189, 248, 0.4)'">[ ACCESS OFFSITE CIPHER VAULT ]</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <p style="text-align: center; font-size: 1.1rem; margin-bottom: 3rem; color: #a1a1aa;">The following archival technologies are strictly confidential. To bypass the security node, the access key must be synthesized from our failures.</p>
+
+        <div class="product-grid">
+            <div class="product-card">
+                <div class="product-title">KIRA Surveillance Network</div>
+                <div class="sku">SKU: KRA-8839-AX</div>
+                <div class="dev-tag">Lead: L. Yagami</div>
+                <p>A predictive algorithmic surveillance system designed to monitor global communication networks. Bypasses all international privacy laws.</p>
+                <div class="status-tag status-active">STATUS: ACTIVE DEPLOYMENT</div>
+            </div>
+
+            <div class="product-card discontinued">
+                <div class="product-title">Vector Dynamics</div>
+                <div class="sku">SKU: VCT-1099-ZZ</div>
+                <div class="dev-tag">Lead: [REDACTED]</div>
+                <p>An experimental localized gravitational manipulator tested near the Princeton Village facility, triggering an unforeseen seismic anomaly.</p>
+                <div class="status-tag status-dead">STATUS: DISCONTINUED (V)</div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-title">Kyoka Interface</div>
+                <div class="sku">SKU: KYK-5541-SA</div>
+                <div class="dev-tag">Lead: S. Aizen</div>
+                <p>A neural-link software overlaying augmented reality directly into the user's optic nerve, providing absolute <span style="color: #fff; font-weight: 600;">ILLUSION</span> control over perception.</p>
+                <div class="status-tag status-active">STATUS: PROTOTYPE TESTING</div>
+            </div>
+
+            <div class="product-card discontinued">
+                <div class="product-title">Oracle Engine</div>
+                <div class="sku">SKU: ORC-2022-XX</div>
+                <div class="dev-tag">Lead: [REDACTED]</div>
+                <p>An AI designed to predict stock market fluctuations using quantum computing methods before attempting unauthorized asset liquidation.</p>
+                <div class="status-tag status-dead">STATUS: DISCONTINUED (O)</div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-title">Infinity Barrier</div>
+                <div class="sku">SKU: INF-5581-SG</div>
+                <div class="dev-tag">Lead: S. Gojo</div>
+                <p>A kinetic energy displacement shield utilizing spatial manipulation to slow down high-velocity projectiles.</p>
+                <div class="status-tag status-active">STATUS: ACTIVE</div>
+            </div>
+
+            <div class="product-card discontinued">
+                <div class="product-title">Icarus Descent</div>
+                <div class="sku">SKU: ICR-4401-FL</div>
+                <div class="dev-tag">Lead: [REDACTED]</div>
+                <p>An atmospheric drop-pod intended for rapid executive extraction. Scrapped after a fatal algorithmic stack overflow.</p>
+                <div class="status-tag status-dead">STATUS: DISCONTINUED (I)</div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-title">Kennel Restraints</div>
+                <div class="sku">SKU: KNL-6660-MK</div>
+                <div class="dev-tag">Lead: Makima</div>
+                <p>Psychological conditioning software deployed via subliminal audio frequencies to ensure total workforce compliance.</p>
+                <div class="status-tag status-active">STATUS: ACTIVE DEPLOYMENT</div>
+            </div>
+
+            <div class="product-card discontinued">
+                <div class="product-title">Dead Zone Containment</div>
+                <div class="sku">SKU: DZN-9904-TR</div>
+                <div class="dev-tag">Lead: [REDACTED]</div>
+                <p>Subterranean isolation chambers for biological assets, shuttered after a total seal failure during a power surge.</p>
+                <div class="status-tag status-dead">STATUS: DISCONTINUED (D)</div>
+            </div>
+        </div>
+
+        <div class="terminal-access">
+            <p style="color: #a1a1aa; margin-bottom: 1.5rem; font-family: 'Courier New', monospace;">SECURE NODE LOGIN</p>
+            <div style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <input type="text" id="terminal-pass" class="input-field" placeholder="4-LETTER OVERRIDE" maxlength="4" autocomplete="off">
+                <button class="btn-connect" onclick="accessTerminal()">INITIALIZE</button>
+            </div>
+            <p id="error-msg" style="color: var(--neon-red); display: none; margin-top: 1.5rem; font-family: 'Courier New', monospace; letter-spacing: 2px;">[ ACCESS DENIED ]</p>
+            
+            <!-- Hidden Note containing Node 6 PIN: 4920 -->
+            <div style="margin-top: 3rem; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 1rem; font-family: 'Courier New', monospace; font-size: 0.8rem; color: #52525b;">
+                DEV NOTE: Node 06 override frequency confirmed as <span style="color: #71717a; user-select: text;">4920</span>. Do not leave in production logs.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function accessTerminal() {
+            const code = document.getElementById('terminal-pass').value.toUpperCase();
+            if(code === "VOID") {
+                window.location.href = "terminal.html";
+            } else {
+                const errorEl = document.getElementById('error-msg');
+                errorEl.style.display = 'block';
+                setTimeout(() => errorEl.style.display = 'none', 2500);
+            }
+        }
+        document.getElementById("terminal-pass").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") { event.preventDefault(); accessTerminal(); }
+        });
+    </script>
+</body>
+</html>
